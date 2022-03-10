@@ -3,14 +3,17 @@
 #include <netinet/in.h>
 #include <string>
 
-struct SocketNet
+class SocketNet
 {
-    int socket_fd;
-    struct sockaddr_in address;
-    SocketNet(const std::string hostname, const unsigned int port);
+private:
+    int socket_fd = 0;
+    sockaddr_in address;
+
+public:
+    SocketNet(const std::string hostip, const unsigned int port);
+    ~SocketNet();
     int readData(void *buffer, size_t size);
     void sendData();
-    ~SocketNet();
 };
 
 #define NETWORK_H
