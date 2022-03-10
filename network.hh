@@ -13,7 +13,7 @@ public:
     SocketNet(const std::string hostip, const unsigned int port);
     ~SocketNet();
     int readData(void *buffer, size_t size);
-    void sendData();
+    int sendData(void *buffer, size_t size);
 };
 
 #define NETWORK_H

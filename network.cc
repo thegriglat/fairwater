@@ -22,7 +22,7 @@ SocketNet::SocketNet(const std::string hostip, const unsigned int port)
     // memset(&address, '0', sizeof(address));
     address.sin_family = AF_INET;
     address.sin_port = htons(port);
-    
+
     // TODO: hostname is IP
     if (inet_pton(AF_INET, hostip.c_str(), &address.sin_addr) <= 0)
     {
@@ -42,6 +42,12 @@ SocketNet::~SocketNet()
 }
 
 int SocketNet::readData(void *buffer, size_t size)
+{
+    // memset(buffer, '0', size);
+    return read(socket_fd, buffer, size - 1);
+}
+
+int SocketNet::sendData(void *buffer, size_t size)
 {
     // memset(buffer, '0', size);
     return read(socket_fd, buffer, size - 1);
