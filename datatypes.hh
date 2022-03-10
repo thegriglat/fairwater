@@ -75,13 +75,13 @@ struct FrameHeader
 {
     uint32_t length;
     FrameType frameType;
-}
+};
 
 struct Frame
 {
     FrameHeader header;
     void *data;
-}
+};
 
 #define DATATYPES_H
 #endif
