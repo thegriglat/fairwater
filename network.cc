@@ -10,7 +10,11 @@
 #include <unistd.h>
 #include <memory.h>
 
+#include "datatypes.hh"
+
 #define IP_PROTOCOL (0)
+
+using namespace std;
 
 namespace
 {
@@ -48,8 +52,6 @@ SocketNet::SocketNet(const std::string hostname, const unsigned int port)
     address.sin_family = AF_INET;
     address.sin_port = htons(port);
 
-    // TODO: hostname is IP !!!
-    std::cout << getIPByName(hostname) << std::endl;
     if (inet_pton(AF_INET, getIPByName(hostname).c_str(), &address.sin_addr) <= 0)
     {
         std::cerr << "inet_pton failed" << std::endl;
@@ -71,20 +73,58 @@ SocketNet::~SocketNet()
 int SocketNet::readData(void *buffer, size_t size)
 {
     // memset(buffer, '0', size);
-    const int r = read(socket_fd, buffer, size - 1);
+    const int r = read(socket_fd, buffer, size);
     if (r < 0)
     {
-        std::cerr << "Cannot read data from socket" << std::endl;
+        std::cerr << "Cannot read data from socket: " << r << std::endl;
     }
     return r;
 }
 
 int SocketNet::sendData(void *buffer, size_t size)
 {
-    const int r = send(socket_fd, buffer, size - 1, 0);
+    const int r = write(socket_fd, buffer, size);
     if (r < 0)
     {
-        std::cerr << "Cannot send data to socket" << std::endl;
+        std::cerr << "Cannot send data to socket: " << r << std::endl;
     }
     return r;
+}
+
+void SocketNet::sendStart()
+{
+    cout << "Sending Start" << endl;
+    Frame frame;
+    frame.header.frameType = FrameType::Start;
+    frame.header.length = sizeof(frame);
+    sendData(&frame, sizeof(frame));
+}
+
+void SocketNet::sendStop()
+{
+    cout << "Sending Stop" << endl;
+    Frame frame;
+    frame.header.frameType = FrameType::Stop;
+    frame.header.length = sizeof(frame);
+    sendData(&frame, sizeof(frame));
+}
+
+void SocketNet::sendGeneralInterrogation()
+{
+    cout << "Sending GeneralInterrogation" << endl;
+    Frame frame;
+    frame.header.frameType = FrameType::GeneralInterrogation;
+    frame.header.length = sizeof(frame);
+    sendData(&frame, sizeof(frame));
+}
+
+void SocketNet::sendDigitalControl(uint8_t pointId, uint8_t value)
+{
+    cout << "Sending DigitalControl" << endl;
+    Frame frame;
+    frame.header.frameType = FrameType::DigitalControl;
+    frame.header.length = sizeof(frame) + 4 + 1;
+    sendData(&frame, sizeof(frame));
+    sendData(&pointId, sizeof(pointId));
+    sendData(&value, sizeof(value));
 }

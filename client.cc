@@ -2,22 +2,24 @@
 #include <iostream>
 #include "network.hh"
 #include <string>
+#include "datatypes.hh"
+#include "response.hh"
 
-#define N 300
+using namespace std;
 
 int main(int argc, char **argv)
 {
-    char buf[N];
     const std::string host = "cpptest.08z.ru";
     const unsigned int port = 12567;
-    std::string txt = "asd";
-
     SocketNet sckt(host, port);
 
-    sckt.readData(buf, N);
-    buf[N - 1] = '\0';
-    std::cout << buf << std::endl;
-    // sckt.sendData((void *)txt.c_str(), txt.size());
+    // sending start
+
+    sckt.sendStart();
+    // getting answer
+    Frame frame;
+    sckt.readData(&frame, sizeof(frame));
+    ResponseParser(&frame, sizeof(frame)).log();
 
     return 0;
 }

@@ -47,11 +47,6 @@ public:
     {
         return raw & 4; // bit 3
     }
-
-    uint8_t raw() const
-    {
-        return raw;
-    }
 };
 
 class DataPoint
@@ -80,7 +75,7 @@ struct FrameHeader
 struct Frame
 {
     FrameHeader header;
-    void *data;
+    void *payload = nullptr;
 };
 
 #define DATATYPES_H

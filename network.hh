@@ -14,6 +14,11 @@ public:
     ~SocketNet();
     int readData(void *buffer, size_t size);
     int sendData(void *buffer, size_t size);
+
+    void sendStart();
+    void sendStop();
+    void sendGeneralInterrogation();
+    void sendDigitalControl(uint8_t pointId, uint8_t value);
 };
 
 #define NETWORK_H
