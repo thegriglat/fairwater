@@ -51,7 +51,7 @@ namespace
         case FrameType::AnalogPoints:
             return "AnalogPoints";
         }
-        return "";
+        return "undefined type";
     }
 };
 
@@ -107,34 +107,40 @@ int SocketNet::sendData(void *buffer, size_t size)
     return r;
 }
 
-void SocketNet::sendStart()
+Frame SocketNet::sendStart()
 {
     cout << "Sending Start" << endl;
     Frame frame;
     frame.header.frameType = FrameType::Start;
     frame.header.length = sizeof(frame);
     sendData(&frame, sizeof(frame));
+    return readFrame();
 }
 
-void SocketNet::sendStop()
+Frame SocketNet::sendStop()
 {
     cout << "Sending Stop" << endl;
     Frame frame;
     frame.header.frameType = FrameType::Stop;
     frame.header.length = sizeof(frame);
     sendData(&frame, sizeof(frame));
+    return readFrame();
 }
 
-void SocketNet::sendGeneralInterrogation()
+Frame SocketNet::sendGeneralInterrogation()
 {
     cout << "Sending GeneralInterrogation" << endl;
     Frame frame;
     frame.header.frameType = FrameType::GeneralInterrogation;
     frame.header.length = sizeof(frame);
     sendData(&frame, sizeof(frame));
+    auto readed_frame = readFrame();
+    if (readed_frame.header.frameType == FrameType::Ack)
+        return readFrame();
+    return readed_frame;
 }
 
-void SocketNet::sendDigitalControl(uint8_t pointId, uint8_t value)
+Frame SocketNet::sendDigitalControl(uint32_t pointId, uint8_t value)
 {
     cout << "Sending DigitalControl" << endl;
     Frame frame;
@@ -143,6 +149,7 @@ void SocketNet::sendDigitalControl(uint8_t pointId, uint8_t value)
     sendData(&frame, sizeof(frame));
     sendData(&pointId, sizeof(pointId));
     sendData(&value, sizeof(value));
+    return readFrame();
 }
 
 Frame SocketNet::readFrame()
@@ -150,11 +157,21 @@ Frame SocketNet::readFrame()
     Frame frame;
     readData(&frame.header, sizeof(frame.header));
     cout << "Received " << FrameType2Str(frame.header.frameType) << endl;
-    /*
-    if (frame.header.frameType == FrameType::DigitalPoints){
-        int causeOfTransmission;
-        int
+    if (frame.header.frameType == FrameType::DigitalPoints)
+    {
+        readData(&(frame.payload_header), sizeof(frame.payload_header));
+
+        if (frame.payload_header.count != 0)
+        {
+            frame.digital_points = new DigitalPoint[frame.payload_header.count];
+            readData(frame.digital_points, frame.payload_header.count * sizeof(DigitalPoint));
+        }
     }
-    */
+    if (frame.header.frameType == FrameType::AnalogPoints)
+    {
+        readData(&frame.payload_header, sizeof(PayloadHeader));
+        frame.analog_points = new AnalogPoint[frame.payload_header.count];
+        readData(frame.analog_points, frame.payload_header.count * sizeof(AnalogPoint));
+    }
     return frame;
 }

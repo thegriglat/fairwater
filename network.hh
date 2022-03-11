@@ -9,6 +9,7 @@ class SocketNet
 private:
     int socket_fd = 0;
     sockaddr_in address;
+    Frame readFrame();
 
 public:
     SocketNet(const std::string hostip, const unsigned int port);
@@ -16,12 +17,10 @@ public:
     int readData(void *buffer, size_t size);
     int sendData(void *buffer, size_t size);
 
-    void sendStart();
-    void sendStop();
-    void sendGeneralInterrogation();
-    void sendDigitalControl(uint8_t pointId, uint8_t value);
-
-    Frame readFrame();
+    Frame sendStart();
+    Frame sendStop();
+    Frame sendGeneralInterrogation();
+    Frame sendDigitalControl(uint32_t pointId, uint8_t value);
 };
 
 #define NETWORK_H

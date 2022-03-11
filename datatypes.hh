@@ -1,10 +1,11 @@
 #ifndef DATATYPES_H
 
 #include <stdint.h>
+#include <string>
 
 // enums
 
-enum TransmissionType
+enum TransmissionType : uint8_t
 {
     Interrogation = 1,
     Spontaneous = 2
@@ -23,6 +24,7 @@ enum FrameType : uint8_t
 };
 
 // data types
+#pragma pack(push, 1)
 
 class Quality
 {
@@ -33,50 +35,64 @@ public:
     Quality(){};
     Quality(uint8_t quality) : raw(quality){};
 
-    bool isValid() const
+    inline bool isValid() const
     {
         return raw & 1; // bit 1
     }
 
-    bool isSubstituted() const
+    inline bool isSubstituted() const
     {
         return raw & 2; // bit 2
     }
 
-    bool isOverflow() const
+    inline bool isOverflow() const
     {
         return raw & 4; // bit 3
     }
+
+    std::string str() const;
 };
 
-class DataPoint
+struct DigitalPoint
 {
-    int32_t timeTag;
-    uint32_t pointId;
-    Quality quality;
+    uint32_t pointId = 0;
+    uint8_t value = 0;
+    int64_t timeTag = 0;
+    Quality quality = 0;
+
+    void print() const;
 };
 
-class DigitalPoint : public DataPoint
+struct AnalogPoint
 {
-    uint8_t value;
-};
-
-class AnalogPoint : public DataPoint
-{
-    float value;
+    uint32_t pointId = 0;
+    float value = 0.0;
+    int64_t timeTag = 0;
+    Quality quality = 0;
 };
 
 struct FrameHeader
 {
-    uint32_t length;
+    uint32_t length = 0;
     FrameType frameType;
+};
+
+struct PayloadHeader
+{
+    uint8_t causeOfTransmission = TransmissionType::Interrogation;
+    uint16_t count = 0;
 };
 
 struct Frame
 {
     FrameHeader header;
-    void *payload = nullptr;
+    PayloadHeader payload_header;
+    DigitalPoint *digital_points = nullptr;
+    AnalogPoint *analog_points = nullptr;
+    ~Frame();
+    void print() const;
 };
 
+#pragma pack(pop)
 #define DATATYPES_H
 #endif

@@ -14,9 +14,9 @@ int main(int argc, char **argv)
 
     // sending start
 
-    sckt.sendStart();
-    // getting answer
-    Frame frame = sckt.readFrame();
-
+    auto frame = sckt.sendStart();
+    frame.print();
+    frame = sckt.sendGeneralInterrogation();
+    frame.print();
     return 0;
 }
