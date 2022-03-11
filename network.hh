@@ -2,6 +2,7 @@
 
 #include <netinet/in.h>
 #include <string>
+#include "datatypes.hh"
 
 class SocketNet
 {
@@ -19,6 +20,8 @@ public:
     void sendStop();
     void sendGeneralInterrogation();
     void sendDigitalControl(uint8_t pointId, uint8_t value);
+
+    Frame readFrame();
 };
 
 #define NETWORK_H

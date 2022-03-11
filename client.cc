@@ -3,7 +3,6 @@
 #include "network.hh"
 #include <string>
 #include "datatypes.hh"
-#include "response.hh"
 
 using namespace std;
 
@@ -17,9 +16,7 @@ int main(int argc, char **argv)
 
     sckt.sendStart();
     // getting answer
-    Frame frame;
-    sckt.readData(&frame, sizeof(frame));
-    ResponseParser(&frame, sizeof(frame)).log();
+    Frame frame = sckt.readFrame();
 
     return 0;
 }

@@ -37,6 +37,22 @@ namespace
         std::string ip = inet_ntoa(*addr_list[0]);
         return ip;
     }
+
+    string FrameType2Str(FrameType type)
+    {
+        switch (type)
+        {
+        case FrameType::Ack:
+            return "Ack";
+        case FrameType::Nack:
+            return "Nack";
+        case FrameType::DigitalPoints:
+            return "DigitalPoints";
+        case FrameType::AnalogPoints:
+            return "AnalogPoints";
+        }
+        return "";
+    }
 };
 
 SocketNet::SocketNet(const std::string hostname, const unsigned int port)
@@ -127,4 +143,18 @@ void SocketNet::sendDigitalControl(uint8_t pointId, uint8_t value)
     sendData(&frame, sizeof(frame));
     sendData(&pointId, sizeof(pointId));
     sendData(&value, sizeof(value));
+}
+
+Frame SocketNet::readFrame()
+{
+    Frame frame;
+    readData(&frame.header, sizeof(frame.header));
+    cout << "Received " << FrameType2Str(frame.header.frameType) << endl;
+    /*
+    if (frame.header.frameType == FrameType::DigitalPoints){
+        int causeOfTransmission;
+        int
+    }
+    */
+    return frame;
 }
