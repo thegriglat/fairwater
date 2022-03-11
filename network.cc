@@ -98,7 +98,6 @@ void SocketNet::Stop()
 
 int SocketNet::readData(void *buffer, size_t size)
 {
-    // memset(buffer, '0', size);
     const int r = read(socket_fd, buffer, size);
     if (r < 0)
     {
