@@ -173,7 +173,7 @@ Frame SocketNet::sendDigitalControl(uint32_t pointId, uint8_t value)
     auto f = readFrame();
     if (f.header.frameType == FrameType::Ack)
     {
-        f = readFrame();
+        return readFrame();
     }
     return f;
 }
@@ -195,7 +195,7 @@ Frame SocketNet::readFrame()
     }
     if (frame.header.frameType == FrameType::AnalogPoints)
     {
-        readData(&frame.payload_header, sizeof(PayloadHeader));
+        readData(&frame.payload_header, sizeof(frame.payload_header));
         if (frame.payload_header.count != 0)
         {
             frame.analog_points = new AnalogPoint[frame.payload_header.count];

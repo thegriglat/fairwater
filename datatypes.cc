@@ -31,11 +31,11 @@ std::string timestamp2str(uint32_t timestamp)
 Frame::~Frame()
 {
     /*
-    if (digital_points)
+    if (digital_points != nullptr)
     {
         delete[] digital_points;
     }
-    if (analog_points)
+    if (analog_points != nullptr)
     {
         delete[] analog_points;
     }

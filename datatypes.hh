@@ -56,7 +56,7 @@ public:
 struct DigitalPoint
 {
     uint32_t pointId = 0;
-    uint8_t value = 0;
+    uint8_t value = 0.0;
     int64_t timeTag = 0;
     Quality quality = 0;
 
