@@ -189,8 +189,11 @@ Frame SocketNet::readFrame()
 
         if (frame.payload_header.count != 0)
         {
-            frame.digital_points = new DigitalPoint[frame.payload_header.count];
-            readData(frame.digital_points, frame.payload_header.count * sizeof(DigitalPoint));
+            DigitalPoint *points = new DigitalPoint[frame.payload_header.count];
+            readData(points, frame.payload_header.count * sizeof(DigitalPoint));
+            for (int i = 0; i < frame.payload_header.count; ++i)
+                frame.digital_points.push_back(points[i]);
+            delete[] points;
         }
     }
     if (frame.header.frameType == FrameType::AnalogPoints)
@@ -198,8 +201,12 @@ Frame SocketNet::readFrame()
         readData(&frame.payload_header, sizeof(frame.payload_header));
         if (frame.payload_header.count != 0)
         {
-            frame.analog_points = new AnalogPoint[frame.payload_header.count];
-            readData(frame.analog_points, frame.payload_header.count * sizeof(AnalogPoint));
+
+            AnalogPoint *points = new AnalogPoint[frame.payload_header.count];
+            readData(points, frame.payload_header.count * sizeof(AnalogPoint));
+            for (int i = 0; i < frame.payload_header.count; ++i)
+                frame.analog_points.push_back(points[i]);
+            delete[] points;
         }
     }
     return frame;

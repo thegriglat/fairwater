@@ -28,20 +28,6 @@ std::string timestamp2str(uint32_t timestamp)
     return s;
 }
 
-Frame::~Frame()
-{
-    /*
-    if (digital_points != nullptr)
-    {
-        delete[] digital_points;
-    }
-    if (analog_points != nullptr)
-    {
-        delete[] analog_points;
-    }
-    */
-}
-
 void DigitalPoint::print() const
 {
     std::cout << "PointId=" << pointId << ", "
@@ -62,16 +48,12 @@ void Frame::print() const
 {
     if (header.frameType == FrameType::DigitalPoints)
     {
-        for (int i = 0; i < payload_header.count; ++i)
-        {
-            digital_points[i].print();
-        }
+        for (const auto &elem : digital_points)
+            elem.print();
     }
     if (header.frameType == FrameType::AnalogPoints)
     {
-        for (int i = 0; i < payload_header.count; ++i)
-        {
-            analog_points[i].print();
-        }
+        for (const auto &elem : analog_points)
+            elem.print();
     }
 }

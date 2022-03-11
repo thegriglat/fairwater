@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 // enums
 
@@ -89,9 +90,8 @@ struct Frame
 {
     FrameHeader header;
     PayloadHeader payload_header;
-    DigitalPoint *digital_points = nullptr;
-    AnalogPoint *analog_points = nullptr;
-    ~Frame();
+    std::vector<DigitalPoint> digital_points;
+    std::vector<AnalogPoint> analog_points;
     void print() const;
 };
 
