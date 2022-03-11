@@ -16,7 +16,16 @@ int main(int argc, char **argv)
 
     auto frame = sckt.sendStart();
     frame.print();
-    frame = sckt.sendGeneralInterrogation();
+
+    auto frames = sckt.sendGeneralInterrogation();
+    for (auto &f : frames)
+        f.print();
+
+    frame = sckt.sendDigitalControl(2, 1);
+    frame.print();
+
+
+    frame = sckt.sendStop();
     frame.print();
     return 0;
 }

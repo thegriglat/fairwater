@@ -50,6 +50,14 @@ void DigitalPoint::print() const
               << "Quality=" << quality.str() << std::endl;
 }
 
+void AnalogPoint::print() const
+{
+    std::cout << "PointId=" << pointId << ", "
+              << "Value=" << value << ", "
+              << "TimeTag=" << timestamp2str(timeTag) << ", "
+              << "Quality=" << quality.str() << std::endl;
+}
+
 void Frame::print() const
 {
     if (header.frameType == FrameType::DigitalPoints)
@@ -57,6 +65,13 @@ void Frame::print() const
         for (int i = 0; i < payload_header.count; ++i)
         {
             digital_points[i].print();
+        }
+    }
+    if (header.frameType == FrameType::AnalogPoints)
+    {
+        for (int i = 0; i < payload_header.count; ++i)
+        {
+            analog_points[i].print();
         }
     }
 }

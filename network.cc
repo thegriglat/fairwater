@@ -9,7 +9,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <memory.h>
-
+#include <vector>
 #include "datatypes.hh"
 
 #define IP_PROTOCOL (0)
@@ -79,10 +79,20 @@ SocketNet::SocketNet(const std::string hostname, const unsigned int port)
         exit(1);
     }
     std::cout << "Connected" << std::endl;
+    isRunning = true;
 };
 
 SocketNet::~SocketNet()
 {
+    Stop();
+}
+
+void SocketNet::Stop()
+{
+    if (!isRunning)
+        return;
+    isRunning = false;
+    std::cerr << "Connection closed." << std::endl;
     shutdown(socket_fd, 2);
 }
 
@@ -124,10 +134,15 @@ Frame SocketNet::sendStop()
     frame.header.frameType = FrameType::Stop;
     frame.header.length = sizeof(frame);
     sendData(&frame, sizeof(frame));
-    return readFrame();
+    auto f = readFrame();
+    if (f.header.frameType == FrameType::Ack)
+    {
+        Stop();
+    }
+    return f;
 }
 
-Frame SocketNet::sendGeneralInterrogation()
+std::vector<Frame> SocketNet::sendGeneralInterrogation()
 {
     cout << "Sending GeneralInterrogation" << endl;
     Frame frame;
@@ -135,21 +150,32 @@ Frame SocketNet::sendGeneralInterrogation()
     frame.header.length = sizeof(frame);
     sendData(&frame, sizeof(frame));
     auto readed_frame = readFrame();
+    std::vector<Frame> frames;
     if (readed_frame.header.frameType == FrameType::Ack)
-        return readFrame();
-    return readed_frame;
+    {
+        frames.push_back(readFrame()); // digital
+        frames.push_back(readFrame()); // analog
+    }
+    return frames;
 }
 
 Frame SocketNet::sendDigitalControl(uint32_t pointId, uint8_t value)
 {
-    cout << "Sending DigitalControl" << endl;
+    cout << "Sending DigitalControl\n  pointId: " << pointId << ", value: " << (int)value << endl;
     Frame frame;
     frame.header.frameType = FrameType::DigitalControl;
-    frame.header.length = sizeof(frame) + 4 + 1;
+    frame.header.length = sizeof(frame) + sizeof(pointId) + sizeof(value);
     sendData(&frame, sizeof(frame));
     sendData(&pointId, sizeof(pointId));
     sendData(&value, sizeof(value));
-    return readFrame();
+    if (!isRunning)
+        return frame;
+    auto f = readFrame();
+    if (f.header.frameType == FrameType::Ack)
+    {
+        f = readFrame();
+    }
+    return f;
 }
 
 Frame SocketNet::readFrame()
@@ -170,8 +196,11 @@ Frame SocketNet::readFrame()
     if (frame.header.frameType == FrameType::AnalogPoints)
     {
         readData(&frame.payload_header, sizeof(PayloadHeader));
-        frame.analog_points = new AnalogPoint[frame.payload_header.count];
-        readData(frame.analog_points, frame.payload_header.count * sizeof(AnalogPoint));
+        if (frame.payload_header.count != 0)
+        {
+            frame.analog_points = new AnalogPoint[frame.payload_header.count];
+            readData(frame.analog_points, frame.payload_header.count * sizeof(AnalogPoint));
+        }
     }
     return frame;
 }

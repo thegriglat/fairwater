@@ -37,17 +37,17 @@ public:
 
     inline bool isValid() const
     {
-        return raw & 1; // bit 1
+        return raw & (1);
     }
 
     inline bool isSubstituted() const
     {
-        return raw & 2; // bit 2
+        return raw & (1 << 2);
     }
 
     inline bool isOverflow() const
     {
-        return raw & 4; // bit 3
+        return raw & (1 << 1);
     }
 
     std::string str() const;
@@ -69,6 +69,8 @@ struct AnalogPoint
     float value = 0.0;
     int64_t timeTag = 0;
     Quality quality = 0;
+
+    void print() const;
 };
 
 struct FrameHeader
