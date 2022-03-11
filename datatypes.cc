@@ -2,6 +2,7 @@
 #include "stdlib.h"
 #include <iostream>
 #include <string>
+#include <iomanip>
 #include <chrono>
 
 std::string Quality::str() const
@@ -39,7 +40,7 @@ void DigitalPoint::print() const
 void AnalogPoint::print() const
 {
     std::cout << "PointId=" << pointId << ", "
-              << "Value=" << value << ", "
+              << std::setprecision(1) << std::fixed << "Value=" << value << ", "
               << "TimeTag=" << timestamp2str(timeTag) << ", "
               << "Quality=" << quality.str() << std::endl;
 }
